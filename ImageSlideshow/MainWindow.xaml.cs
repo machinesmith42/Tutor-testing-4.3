@@ -88,7 +88,7 @@ namespace ImageSlideshow {
             d = DateTime.Now;
 
             clock.Content = d.ToString("h:mm:ss tt", CultureInfo.CurrentCulture);
-            date.Content = d.ToString("dddd, MMMM, dd, yyyy", CultureInfo.CurrentCulture);
+            date.Content = d.ToString("dddd, \nMMMM dd, yyyy", CultureInfo.CurrentCulture);
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e) {

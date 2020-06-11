@@ -4,8 +4,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
         Loaded="Window_Loaded" mc:Ignorable="d"
-        Title="MainWindow" Height="720" Width="1280" WindowStyle=" none" ResizeMode="NoResize"
-        WindowState="Maximized">
+        Title="MainWindow"  WindowStyle=" none" ResizeMode="NoResize"
+        WindowState="Maximized"
+        Height="{Binding SystemParameters.PrimaryScreenHeight}" 
+        Width="{Binding SystemParameters.PrimaryScreenWidth}">
         
     <Window.Resources>
         <!-- Start Fade -->
@@ -39,15 +41,17 @@
         <!-- End Fade -->
     </Window.Resources>
 
-    <Canvas Width="1280" Height="720">
-        <Image x:Name="myImage" Stretch="UniformToFill" RenderTransformOrigin="0.5,0.5" Width="1280" Height="720">
+    <Grid>
+        <Image x:Name="myImage" Stretch="Uniform" RenderTransformOrigin="0.5,0.5"  
+    >
             <Image.RenderTransform>
                 <TransformGroup>
                     <TranslateTransform X="0" Y="0" />
                 </TransformGroup>
             </Image.RenderTransform>
         </Image>
-        <Image x:Name="myImage2" Stretch="UniformToFill" RenderTransformOrigin="0.5,0.5" Width="1280" Height="720">
+        <Image x:Name="myImage2" Stretch="Uniform" RenderTransformOrigin="0.5,0.5"  
+    >
             <Image.RenderTransform>
                 <TransformGroup>
                     <TranslateTransform X="0" Y="0" />
@@ -55,10 +59,12 @@
             </Image.RenderTransform>
         </Image>
         <TextBlock TextWrapping="Wrap" x:Name="ErrorText" HorizontalAlignment="Stretch" VerticalAlignment="Center" TextAlignment="Center" Visibility="Collapsed" Text="The specified folder does not exist" FontSize="20" />
-        <StackPanel Height="120" Canvas.Left="800" Canvas.Top="622.167" Width="auto">
-            <Label HorizontalAlignment="Left" Height="60" Width="Auto" HorizontalContentAlignment="Center" Name="date" FontSize="30px"/>
-            <Label HorizontalAlignment="Left" Height="60" Width="Auto" HorizontalContentAlignment="Center" Name="clock" FontSize="30px"/>
-        </StackPanel>
-
-    </Canvas>
+        <Border Padding="15">   
+        <StackPanel Height="Auto"  Width="auto" HorizontalAlignment="Right" VerticalAlignment="Top" >
+                <Label HorizontalAlignment="Left" Height="Auto" Width="Auto" HorizontalContentAlignment="Left" Name="date" FontSize="30px"/>
+                <Label HorizontalAlignment="Left" Height="Auto" Width="Auto" HorizontalContentAlignment="Left" Name="clock" FontSize="30px"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+   
 </Window>
