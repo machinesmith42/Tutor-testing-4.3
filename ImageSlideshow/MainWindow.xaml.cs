@@ -24,7 +24,7 @@ namespace ImageSlideshow {
         private readonly DispatcherTimer timerImageChange;
         private readonly DispatcherTimer clockUpdate;
         private readonly Image[] ImageControls;
-        private List<ImageSource> Images = new List<ImageSource>();
+        public static List<ImageSource> Images = new List<ImageSource>();
         private static readonly string[] ValidImageExtensions = new[] { ".png", ".jpg", ".jpeg", ".bmp", ".gif" };
         private static readonly string[] TransitionEffects = new[] { "Fade" };
         private string TransitionType;
@@ -36,13 +36,12 @@ namespace ImageSlideshow {
         private static readonly Microsoft.Office.Interop.PowerPoint.Application application = new Microsoft.Office.Interop.PowerPoint.Application();
         private static readonly Presentations ppPresens = application.Presentations;
         private static readonly Presentation objPres = ppPresens.Open(AppDomain.CurrentDomain.BaseDirectory + "\\better powerpoint test v2.pptm", MsoTriState.msoFalse, MsoTriState.msoTrue, MsoTriState.msoTrue);
-        private static Slides objSlides = objPres.Slides;
+        private static readonly Slides objSlides = objPres.Slides;
         private static readonly TutorDataSet.AllTutorsDataTable tutorTable = new TutorDataSet.AllTutorsDataTable();
         private static readonly TutorDataSet.ScheduleDataTable scheduleTable = new TutorDataSet.ScheduleDataTable();
         private static readonly TutorDataSet.SubjectDataTable subjectTable = new TutorDataSet.SubjectDataTable();
 
         private const int tutorsSlide = 1;
-
 
 
         public MainWindow() {
@@ -104,15 +103,15 @@ namespace ImageSlideshow {
         private void LoadImageFolder(string folder) {
             ErrorText.Visibility = Visibility.Collapsed;
             var sw = System.Diagnostics.Stopwatch.StartNew();
-            if (!System.IO.Path.IsPathRooted(folder))
-                folder = System.IO.Path.Combine(Environment.CurrentDirectory, folder);
-            if (!System.IO.Directory.Exists(folder)) {
+            if (!Path.IsPathRooted(folder))
+                folder = Path.Combine(Environment.CurrentDirectory, folder);
+            if (!Directory.Exists(folder)) {
                 ErrorText.Text = "The specified folder does not exist: " + Environment.NewLine + folder;
                 ErrorText.Visibility = Visibility.Visible;
                 return;
             }
 
-            var sources = from file in new System.IO.DirectoryInfo(folder).GetFiles().AsParallel()
+            var sources = from file in new DirectoryInfo(folder).GetFiles().AsParallel()
                           where ValidImageExtensions.Contains(file.Extension, StringComparer.InvariantCultureIgnoreCase)
                           orderby file.Name
                           select CreateImageSource(file.FullName, true);
@@ -140,6 +139,9 @@ namespace ImageSlideshow {
 
         private void TimerImageChange_Tick(object sender, EventArgs e) {
             PlaySlideShow();
+            if(CurrentSourceIndex == 1) {
+                Refresh();
+            }
         }
 
         private void PlaySlideShow() {
@@ -162,23 +164,11 @@ namespace ImageSlideshow {
             StboardFadeOut.Begin(imgFadeOut);
             Storyboard StboardFadeIn = Resources[string.Format(CultureInfo.CurrentCulture, "{0}In", TransitionType.ToString(CultureInfo.CurrentCulture))] as Storyboard;
             StboardFadeIn.Begin(imgFadeIn);
-
-        }
-      static void Init() {
             
-
         }
-        static void MainLoop() {
-           
-        }
-        internal static dynamic CurrentSlide {
-            get {
-                if (application.Active == MsoTriState.msoTrue &&
-                    application.ActiveWindow.Panes[2].Active == MsoTriState.msoTrue) {
-                    return application.ActiveWindow.View.Slide.SlideIndex;
-                }
-                return null;
-            }
+        static void Refresh() {
+            DeleteSlides();
+            DisplayTutors();
         }
         static void DisplayTutors() {
             DateTime currentDayTime = DateTime.Now;
@@ -193,19 +183,18 @@ namespace ImageSlideshow {
                     TutorID = tutor.Field<int>("ID"),
                     Name = tutor.Field<string>("FirstName") + " " + tutor.Field<string>("LastName")
                 };
-            int i = 0;
+            int i = 23;
             foreach (var q in query) {
                 SlideRange slide = CreateSlide(tutorsSlide);
                 WriteToTextbox(slide, "TutorName", q.Name + i);
+                slide.Export(AppDomain.CurrentDomain.BaseDirectory +"\\Images\\"+i.ToString(CultureInfo.CurrentCulture) + ".jpg","JPG");
                 i++;
-                slide.Export(AppDomain.CurrentDomain.BaseDirectory +"\\Images\\"+(i + 23).ToString(CultureInfo.CurrentCulture),"JPG");
             }
         }
         static SlideRange CreateSlide(int copyOfIndex) {
             SlideRange newSlide = objSlides[copyOfIndex].Duplicate();
-            newSlide.SlideShowTransition.Hidden = MsoTriState.msoFalse;
             newSlide.Tags.Add("isCreated", "true");
-            //newSlide.MoveTo(objSlides.Count);
+            newSlide.MoveTo(objSlides.Count);
             return newSlide;
         }
         static string WriteToTextbox(SlideRange slide, string textboxName, string inputString) {
@@ -213,12 +202,13 @@ namespace ImageSlideshow {
             return inputString;
         }
         static int DeleteSlides() {
-            int numberDeleted = 0;
+            int i = 23;
             while (objSlides[objSlides.Count].Tags["isCreated"] == "true") {
-                numberDeleted++;
                 objSlides[objSlides.Count].Delete();
+                File.Delete(AppDomain.CurrentDomain.BaseDirectory + "\\Images\\" + i.ToString(CultureInfo.CurrentCulture) + ".jpg");
+                i++;
             }
-            return numberDeleted;
+            return i;
         }
 
     }
