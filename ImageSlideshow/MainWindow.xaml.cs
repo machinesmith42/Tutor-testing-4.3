@@ -186,7 +186,7 @@ namespace ImageSlideshow {
             int i = 23;
             foreach (var q in query) {
                 SlideRange slide = CreateSlide(tutorsSlide);
-                WriteToTextbox(slide, "TutorName", q.Name + i);
+                WriteToTextbox(slide, "TutorName", q.Name);
                 slide.Export(AppDomain.CurrentDomain.BaseDirectory +"\\Images\\"+i.ToString(CultureInfo.CurrentCulture) + ".jpg","JPG");
                 i++;
             }
