@@ -27,22 +27,23 @@ namespace ImageSlideshow {
         private static readonly string[] ValidImageExtensions = new[] { ".png", ".jpg", ".jpeg", ".bmp", ".gif" };
         private static readonly string[] TransitionEffects = new[] { "Fade" };
         private string TransitionType;
-        public static string strImagePath = "";
+        public static string strImagePath = ConfigurationManager.AppSettings["ImagePath"];
+        public static string strPPPath = ConfigurationManager.AppSettings["PPPath"];
         public static int CurrentSourceIndex;
         private int CurrentCtrlIndex;
         private readonly int EffectIndex = 0;
         private readonly int IntervalTimer;
         private static readonly Microsoft.Office.Interop.PowerPoint.Application application = new Microsoft.Office.Interop.PowerPoint.Application();
         private static readonly Presentations ppPresens = application.Presentations;
-        private static readonly Presentation objPres = ppPresens.Open(AppDomain.CurrentDomain.BaseDirectory + "\\better powerpoint test v2.pptm", MsoTriState.msoFalse, MsoTriState.msoTrue, MsoTriState.msoTrue);
+        private static readonly Presentation objPres = ppPresens.Open(AppDomain.CurrentDomain.BaseDirectory + "\\"+strPPPath, MsoTriState.msoFalse, MsoTriState.msoTrue, MsoTriState.msoTrue);
         private static readonly Slides objSlides = objPres.Slides;
         private static readonly TutorDataSet.AllTutorsDataTable tutorTable = new TutorDataSet.AllTutorsDataTable();
         private static readonly TutorDataSet.ScheduleDataTable scheduleTable = new TutorDataSet.ScheduleDataTable();
         private static readonly TutorDataSet.SubjectDataTable subjectTable = new TutorDataSet.SubjectDataTable();
 
-        public const int tutorsSlide = 1;
-        public const int noTutorsSlide = 2;
-        public const int FirstAddedSlide = 23;
+        public static readonly int tutorsSlide = Convert.ToInt32(ConfigurationManager.AppSettings["tutorSlide"]);
+        public static readonly int noTutorsSlide = Convert.ToInt32(ConfigurationManager.AppSettings["noTutorSlide"]);
+        public static readonly int FirstAddedSlide = Convert.ToInt32(ConfigurationManager.AppSettings["tutorSlid"]);
 
         public MainWindow() {
             InitializeComponent();
@@ -56,6 +57,7 @@ namespace ImageSlideshow {
             scheduleAdapt.Dispose();
             subjectAdapt.Dispose();
             strImagePath = ConfigurationManager.AppSettings["ImagePath"];
+            strPPPath = ConfigurationManager.AppSettings["PPPath"];
             DirectoryInfo dir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "\\" + strImagePath);
             foreach (FileInfo file in dir.EnumerateFiles()) {
                 file.Delete();
