@@ -1,11 +1,12 @@
-﻿using Microsoft.Office.Interop.PowerPoint;
+﻿using ImageSlideshow.TutorDataSetTableAdapters;
+using Microsoft.Office.Interop.PowerPoint;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Globalization;
+using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -13,8 +14,6 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using MsoTriState = Microsoft.Office.Core.MsoTriState;
-using ImageSlideshow.TutorDataSetTableAdapters;
-using System.IO;
 
 namespace ImageSlideshow {
     /// <summary>
@@ -60,7 +59,7 @@ namespace ImageSlideshow {
                 file.Delete();
             }
             for (int i = 4; i < objSlides.Count; i++) {
-                objSlides[i].Export(AppDomain.CurrentDomain.BaseDirectory + "\\Images\\" + (i).ToString("D2",CultureInfo.CurrentCulture)+".jpg", "JPG");
+                objSlides[i].Export(AppDomain.CurrentDomain.BaseDirectory + "\\Images\\" + (i).ToString("D2", CultureInfo.CurrentCulture) + ".jpg", "JPG");
 
             }
 
@@ -78,7 +77,7 @@ namespace ImageSlideshow {
             clockUpdate = new DispatcherTimer() {
                 Interval = new TimeSpan(0, 0, 1)
             };
-            clockUpdate.Tick +=new EventHandler(ClockUpdate_Tick);
+            clockUpdate.Tick += new EventHandler(ClockUpdate_Tick);
         }
 
         private void ClockUpdate_Tick(object sender, EventArgs e) {
@@ -94,7 +93,7 @@ namespace ImageSlideshow {
             LoadImageFolder(strImagePath);
             if (Images.Count == 0)
                 return;
-            CurrentSourceIndex = Images.Count -1;
+            CurrentSourceIndex = Images.Count - 1;
             PlaySlideShow();
             timerImageChange.IsEnabled = true;
             clockUpdate.IsEnabled = true;
@@ -139,7 +138,7 @@ namespace ImageSlideshow {
 
         private void TimerImageChange_Tick(object sender, EventArgs e) {
             PlaySlideShow();
-            if(CurrentSourceIndex == 1) {
+            if (CurrentSourceIndex == 1) {
                 Refresh();
             }
         }
@@ -164,7 +163,7 @@ namespace ImageSlideshow {
             StboardFadeOut.Begin(imgFadeOut);
             Storyboard StboardFadeIn = Resources[string.Format(CultureInfo.CurrentCulture, "{0}In", TransitionType.ToString(CultureInfo.CurrentCulture))] as Storyboard;
             StboardFadeIn.Begin(imgFadeIn);
-            
+
         }
         static void Refresh() {
             DeleteSlides();
@@ -187,9 +186,23 @@ namespace ImageSlideshow {
             foreach (var q in query) {
                 SlideRange slide = CreateSlide(tutorsSlide);
                 WriteToTextbox(slide, "TutorName", q.Name);
-                slide.Export(AppDomain.CurrentDomain.BaseDirectory +"\\Images\\"+i.ToString(CultureInfo.CurrentCulture) + ".jpg","JPG");
+                GetSubject(q.TutorID, slide);
+                slide.Export(AppDomain.CurrentDomain.BaseDirectory + "\\Images\\" + i.ToString(CultureInfo.CurrentCulture) + ".jpg", "JPG");
                 i++;
             }
+        }
+        static void GetSubject(int ID, SlideRange slide) {
+            var query =
+                from sub in subjectTable.AsEnumerable()
+                where sub.Field<int>("ID") == ID
+                select new {
+                    subject = sub.Field<string>("TutorSubject")
+                };
+            string subjects = "";
+            foreach (var q in query) {
+                subjects += q.subject + "\n";
+            }
+            WriteToTextbox(slide, "SubjectsTutored", subjects);
         }
         static SlideRange CreateSlide(int copyOfIndex) {
             SlideRange newSlide = objSlides[copyOfIndex].Duplicate();
