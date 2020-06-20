@@ -35,7 +35,7 @@ namespace ImageSlideshow {
         private readonly int IntervalTimer;
         private static readonly Microsoft.Office.Interop.PowerPoint.Application application = new Microsoft.Office.Interop.PowerPoint.Application();
         private static readonly Presentations ppPresens = application.Presentations;
-        private static readonly Presentation objPres = ppPresens.Open(AppDomain.CurrentDomain.BaseDirectory + "\\"+strPPPath, MsoTriState.msoFalse, MsoTriState.msoTrue, MsoTriState.msoTrue);
+        private static readonly Presentation objPres = ppPresens.Open(AppDomain.CurrentDomain.BaseDirectory + "\\"+strPPPath, MsoTriState.msoFalse, MsoTriState.msoTrue, MsoTriState.msoFalse);
         private static readonly Slides objSlides = objPres.Slides;
         private static readonly TutorDataSet.AllTutorsDataTable tutorTable = new TutorDataSet.AllTutorsDataTable();
         private static readonly TutorDataSet.ScheduleDataTable scheduleTable = new TutorDataSet.ScheduleDataTable();
@@ -43,8 +43,8 @@ namespace ImageSlideshow {
 
         public static readonly int tutorsSlide = Convert.ToInt32(ConfigurationManager.AppSettings["tutorSlide"]);
         public static readonly int noTutorsSlide = Convert.ToInt32(ConfigurationManager.AppSettings["noTutorSlide"]);
-        public static readonly int FirstAddedSlide = Convert.ToInt32(ConfigurationManager.AppSettings["tutorSlid"]);
-
+        public static readonly int FirstAddedSlide = Convert.ToInt32(ConfigurationManager.AppSettings["FirstCreateSlide"]);
+        public static List<string> createdImages = new List<string>();
         public MainWindow() {
             InitializeComponent();
             AllTutorsTableAdapter tutorTableAdapt = new AllTutorsTableAdapter();
@@ -89,7 +89,7 @@ namespace ImageSlideshow {
             DateTime d;
 
             d = DateTime.Now;
-
+            LoadImageFolder(strImagePath);
             clock.Content = d.ToString("h:mm:ss tt", CultureInfo.CurrentCulture);
             date.Content = d.ToString("dddd, \nMMMM dd, yyyy", CultureInfo.CurrentCulture);
         }
@@ -135,7 +135,7 @@ namespace ImageSlideshow {
                 src.Freeze();
                 return src;
             } else {
-                var src = new BitmapImage(new Uri(file, UriKind.Absolute));
+                var src = new BitmapImage(new Uri(file + "?time=" + DateTime.Now.ToString(), UriKind.Absolute));
                 src.Freeze();
                 return src;
             }
@@ -150,7 +150,7 @@ namespace ImageSlideshow {
 
         private void PlaySlideShow() {
 
-            LoadImageFolder(strImagePath);
+            
             if (Images.Count == 0)
                 return;
             var oldCtrlIndex = CurrentCtrlIndex;
@@ -176,6 +176,7 @@ namespace ImageSlideshow {
         }
         static void DisplayTutors() {
             DateTime currentDayTime = DateTime.Now;
+            createdImages.Clear();
             var query =
                 from tutor in tutorTable.AsEnumerable()
                 join schedule in scheduleTable
@@ -187,19 +188,25 @@ namespace ImageSlideshow {
                     TutorID = tutor.Field<int>("ID"),
                     Name = tutor.Field<string>("FirstName") + " " + tutor.Field<string>("LastName")
                 };
-            int i = FirstAddedSlide;
+            int i = objSlides.Count + 1;
+            
             if (query.Any()) {
                 foreach (var q in query) {
                     SlideRange slide = CreateSlide(tutorsSlide);
                     WriteToTextbox(slide, "TutorName", q.Name);
                     GetSubject(q.TutorID, slide);
                     GetTimes(q.TutorID, slide);
-                    slide.Export(AppDomain.CurrentDomain.BaseDirectory + "\\"+ strImagePath + "\\" + i.ToString(CultureInfo.CurrentCulture) + ".jpg", "JPG");
+                    string imageName = DateTime.Now.ToString("HH-mm-ss") + "_" + i.ToString(CultureInfo.CurrentCulture) + ".jpg";
+                    slide.Export(AppDomain.CurrentDomain.BaseDirectory + "\\"+ strImagePath + "\\" + imageName, "JPG");
                     i++;
+                    createdImages.Add(imageName);
+                    
                 }
             } else {
                 SlideRange slide = CreateSlide(noTutorsSlide);
-                slide.Export(AppDomain.CurrentDomain.BaseDirectory + "\\" + strImagePath + "\\" + i.ToString(CultureInfo.CurrentCulture) + ".jpg", "JPG");
+                string imageName = DateTime.Now.ToString("HH-mm-ss") + "_" + i.ToString(CultureInfo.CurrentCulture) + ".jpg";
+                slide.Export(AppDomain.CurrentDomain.BaseDirectory + "\\" + strImagePath + "\\" + imageName, "JPG");
+                createdImages.Add(imageName);
             }
             
         }
@@ -220,8 +227,9 @@ namespace ImageSlideshow {
             var query =
                 from times in scheduleTable.AsEnumerable()
                 where times.Field<int>("ID") == ID
+                orderby times.Field<int>("Day"), times.Field<DateTime>("Start")
                 select new {
-                     time = times.Field<DateTime>("Start").ToString("h:mm tt") + " — " + times.Field<DateTime>("end").ToString("h:mm tt")
+                     time = CultureInfo.CurrentCulture.DateTimeFormat.DayNames[times.Field<int>("Day")-1] + " " + times.Field<DateTime>("Start").ToString("h:mm tt") + " — " + times.Field<DateTime>("end").ToString("h:mm tt")
                 };
             string availableTimes = "";
             foreach (var q in query) {
@@ -240,14 +248,14 @@ namespace ImageSlideshow {
             slide.Shapes[textboxName].TextFrame.TextRange.Text = inputString;
             return inputString;
         }
-        static int DeleteSlides() {
-            int i = FirstAddedSlide;
-            while (objSlides[objSlides.Count].Tags["isCreated"] == "true") {
+        static void DeleteSlides() {
+            
+            foreach(string item in createdImages) { 
                 objSlides[objSlides.Count].Delete();
-                File.Delete(AppDomain.CurrentDomain.BaseDirectory + "\\"+strImagePath+"\\" + i.ToString(CultureInfo.CurrentCulture) + ".jpg");
-                i++;
+                File.Delete(AppDomain.CurrentDomain.BaseDirectory + "\\"+strImagePath+"\\" + item);
+                
             }
-            return i;
+            
         }
 
     }
