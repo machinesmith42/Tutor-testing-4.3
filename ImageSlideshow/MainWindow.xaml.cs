@@ -1,11 +1,12 @@
-﻿using Microsoft.Office.Interop.PowerPoint;
+﻿using ImageSlideshow.TutorDataSetTableAdapters;
+using Microsoft.Office.Interop.PowerPoint;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Globalization;
+using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -13,8 +14,6 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using MsoTriState = Microsoft.Office.Core.MsoTriState;
-using ImageSlideshow.TutorDataSetTableAdapters;
-using System.IO;
 
 namespace ImageSlideshow {
     /// <summary>
@@ -24,27 +23,29 @@ namespace ImageSlideshow {
         private readonly DispatcherTimer timerImageChange;
         private readonly DispatcherTimer clockUpdate;
         private readonly Image[] ImageControls;
-        private List<ImageSource> Images = new List<ImageSource>();
+        public static List<ImageSource> Images = new List<ImageSource>();
         private static readonly string[] ValidImageExtensions = new[] { ".png", ".jpg", ".jpeg", ".bmp", ".gif" };
         private static readonly string[] TransitionEffects = new[] { "Fade" };
         private string TransitionType;
-        private readonly string strImagePath = "";
+        public static string strImagePath = ConfigurationManager.AppSettings["ImagePath"];
+        public static string strPPPath = ConfigurationManager.AppSettings["PPPath"];
         public static int CurrentSourceIndex;
         private int CurrentCtrlIndex;
         private readonly int EffectIndex = 0;
-        private readonly int IntervalTimer = 10;
+        private readonly int IntervalTimer;
         private static readonly Microsoft.Office.Interop.PowerPoint.Application application = new Microsoft.Office.Interop.PowerPoint.Application();
         private static readonly Presentations ppPresens = application.Presentations;
-        private static readonly Presentation objPres = ppPresens.Open(AppDomain.CurrentDomain.BaseDirectory + "\\better powerpoint test v2.pptm", MsoTriState.msoFalse, MsoTriState.msoTrue, MsoTriState.msoTrue);
-        private static Slides objSlides = objPres.Slides;
+        private static readonly Presentation objPres = ppPresens.Open(AppDomain.CurrentDomain.BaseDirectory + "\\"+strPPPath, MsoTriState.msoFalse, MsoTriState.msoTrue, MsoTriState.msoFalse);
+        private static readonly Slides objSlides = objPres.Slides;
         private static readonly TutorDataSet.AllTutorsDataTable tutorTable = new TutorDataSet.AllTutorsDataTable();
         private static readonly TutorDataSet.ScheduleDataTable scheduleTable = new TutorDataSet.ScheduleDataTable();
         private static readonly TutorDataSet.SubjectDataTable subjectTable = new TutorDataSet.SubjectDataTable();
 
-        private const int tutorsSlide = 1;
-
-
-
+        public static readonly int tutorsSlide = Convert.ToInt32(ConfigurationManager.AppSettings["tutorSlide"]);
+        public static readonly int noTutorsSlide = Convert.ToInt32(ConfigurationManager.AppSettings["noTutorSlide"]);
+        public static readonly int FirstAddedSlide = Convert.ToInt32(ConfigurationManager.AppSettings["FirstCreateSlide"]);
+        private readonly int updateSlide;
+        public static List<string> createdImages = new List<string>();
         public MainWindow() {
             InitializeComponent();
             AllTutorsTableAdapter tutorTableAdapt = new AllTutorsTableAdapter();
@@ -56,21 +57,27 @@ namespace ImageSlideshow {
             tutorTableAdapt.Dispose();
             scheduleAdapt.Dispose();
             subjectAdapt.Dispose();
-            DirectoryInfo dir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "\\Images");
+            strImagePath = ConfigurationManager.AppSettings["ImagePath"];
+            strPPPath = ConfigurationManager.AppSettings["PPPath"];
+            
+            DirectoryInfo dir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "\\" + strImagePath);
             foreach (FileInfo file in dir.EnumerateFiles()) {
                 file.Delete();
             }
-            for (int i = 4; i < objSlides.Count; i++) {
-                objSlides[i].Export(AppDomain.CurrentDomain.BaseDirectory + "\\Images\\" + (i).ToString("D2",CultureInfo.CurrentCulture)+".jpg", "JPG");
-
+            int numberVisibleSlides = 0; 
+            for (int i = 1; i < objSlides.Count; i++) {
+                if (objSlides[i].SlideShowTransition.Hidden == MsoTriState.msoFalse) {
+                    objSlides[i].Export(AppDomain.CurrentDomain.BaseDirectory + "\\"+strImagePath+"\\" + i.ToString("D2", CultureInfo.CurrentCulture) + ".jpg", "JPG");
+                    numberVisibleSlides++;
+                }
             }
-
+            updateSlide = numberVisibleSlides;
             //Initialize Image control, Image directory path and Image timer.
             IntervalTimer = Convert.ToInt32(ConfigurationManager.AppSettings["IntervalTime"], CultureInfo.CurrentCulture);
-            strImagePath = ConfigurationManager.AppSettings["ImagePath"];
+            
             ImageControls = new[] { myImage, myImage2 };
 
-            //LoadImageFolder(strImagePath);
+            
 
             timerImageChange = new DispatcherTimer {
                 Interval = new TimeSpan(0, 0, IntervalTimer)
@@ -79,14 +86,14 @@ namespace ImageSlideshow {
             clockUpdate = new DispatcherTimer() {
                 Interval = new TimeSpan(0, 0, 1)
             };
-            clockUpdate.Tick +=new EventHandler(ClockUpdate_Tick);
+            clockUpdate.Tick += new EventHandler(ClockUpdate_Tick);
         }
 
         private void ClockUpdate_Tick(object sender, EventArgs e) {
             DateTime d;
 
             d = DateTime.Now;
-
+            LoadImageFolder(strImagePath);
             clock.Content = d.ToString("h:mm:ss tt", CultureInfo.CurrentCulture);
             date.Content = d.ToString("dddd, \nMMMM dd, yyyy", CultureInfo.CurrentCulture);
         }
@@ -95,7 +102,7 @@ namespace ImageSlideshow {
             LoadImageFolder(strImagePath);
             if (Images.Count == 0)
                 return;
-            CurrentSourceIndex = Images.Count -1;
+            CurrentSourceIndex = Images.Count - 1;
             PlaySlideShow();
             timerImageChange.IsEnabled = true;
             clockUpdate.IsEnabled = true;
@@ -104,15 +111,15 @@ namespace ImageSlideshow {
         private void LoadImageFolder(string folder) {
             ErrorText.Visibility = Visibility.Collapsed;
             var sw = System.Diagnostics.Stopwatch.StartNew();
-            if (!System.IO.Path.IsPathRooted(folder))
-                folder = System.IO.Path.Combine(Environment.CurrentDirectory, folder);
-            if (!System.IO.Directory.Exists(folder)) {
+            if (!Path.IsPathRooted(folder))
+                folder = Path.Combine(Environment.CurrentDirectory, folder);
+            if (!Directory.Exists(folder)) {
                 ErrorText.Text = "The specified folder does not exist: " + Environment.NewLine + folder;
                 ErrorText.Visibility = Visibility.Visible;
                 return;
             }
 
-            var sources = from file in new System.IO.DirectoryInfo(folder).GetFiles().AsParallel()
+            var sources = from file in new DirectoryInfo(folder).GetFiles().AsParallel()
                           where ValidImageExtensions.Contains(file.Extension, StringComparer.InvariantCultureIgnoreCase)
                           orderby file.Name
                           select CreateImageSource(file.FullName, true);
@@ -132,7 +139,7 @@ namespace ImageSlideshow {
                 src.Freeze();
                 return src;
             } else {
-                var src = new BitmapImage(new Uri(file, UriKind.Absolute));
+                var src = new BitmapImage(new Uri(file + "?time=" + DateTime.Now.ToString(), UriKind.Absolute));
                 src.Freeze();
                 return src;
             }
@@ -140,11 +147,14 @@ namespace ImageSlideshow {
 
         private void TimerImageChange_Tick(object sender, EventArgs e) {
             PlaySlideShow();
+            if (CurrentSourceIndex == updateSlide-1) {
+                Refresh();
+            }
         }
 
         private void PlaySlideShow() {
 
-            LoadImageFolder(strImagePath);
+            
             if (Images.Count == 0)
                 return;
             var oldCtrlIndex = CurrentCtrlIndex;
@@ -164,61 +174,100 @@ namespace ImageSlideshow {
             StboardFadeIn.Begin(imgFadeIn);
 
         }
-      static void Init() {
-            
-
-        }
-        static void MainLoop() {
-           
-        }
-        internal static dynamic CurrentSlide {
-            get {
-                if (application.Active == MsoTriState.msoTrue &&
-                    application.ActiveWindow.Panes[2].Active == MsoTriState.msoTrue) {
-                    return application.ActiveWindow.View.Slide.SlideIndex;
-                }
-                return null;
-            }
+        static void Refresh() {
+            DeleteSlides();
+            DisplayTutors();
         }
         static void DisplayTutors() {
             DateTime currentDayTime = DateTime.Now;
+            createdImages.Clear();
             var query =
                 from tutor in tutorTable.AsEnumerable()
                 join schedule in scheduleTable
                 on tutor.Field<int>("ID") equals schedule.Field<int>("ID")
-                where schedule.Field<int>("Day") == (int)currentDayTime.DayOfWeek + 1 &&
-                schedule.Field<DateTime>("Start").TimeOfDay <= currentDayTime.TimeOfDay &&
-                schedule.Field<DateTime>("End").TimeOfDay >= currentDayTime.TimeOfDay
+                where (schedule.Field<int>("Day") == (int)currentDayTime.DayOfWeek + 1) && TimeBetween(currentDayTime, schedule.Field<DateTime>("Start").TimeOfDay, schedule.Field<DateTime>("End").TimeOfDay)
+               
                 select new {
                     TutorID = tutor.Field<int>("ID"),
                     Name = tutor.Field<string>("FirstName") + " " + tutor.Field<string>("LastName")
                 };
-            int i = 0;
-            foreach (var q in query) {
-                SlideRange slide = CreateSlide(tutorsSlide);
-                WriteToTextbox(slide, "TutorName", q.Name + i);
-                i++;
-                slide.Export(AppDomain.CurrentDomain.BaseDirectory +"\\Images\\"+(i + 23).ToString(CultureInfo.CurrentCulture),"JPG");
+            int i = objSlides.Count + 1;
+            
+            if (query.Any()) {
+                foreach (var q in query) {
+                    SlideRange slide = CreateSlide(tutorsSlide);
+                    WriteToTextbox(slide, "TutorName", q.Name);
+                    GetSubject(q.TutorID, slide);
+                    GetTimes(q.TutorID, slide);
+                    string imageName = DateTime.Now.ToString("HH-mm-ss") + "_" + i.ToString(CultureInfo.CurrentCulture) + ".jpg";
+                    slide.Export(AppDomain.CurrentDomain.BaseDirectory + "\\"+ strImagePath + "\\" + imageName, "JPG");
+                    i++;
+                    createdImages.Add(imageName);
+                    
+                }
+            } else {
+                SlideRange slide = CreateSlide(noTutorsSlide);
+                string imageName = DateTime.Now.ToString("HH-mm-ss") + "_" + i.ToString(CultureInfo.CurrentCulture) + ".jpg";
+                slide.Export(AppDomain.CurrentDomain.BaseDirectory + "\\" + strImagePath + "\\" + imageName, "JPG");
+                createdImages.Add(imageName);
             }
+            
+        }
+        static bool TimeBetween(DateTime datetime, TimeSpan start, TimeSpan end) {
+            // convert datetime to a TimeSpan
+            TimeSpan now = datetime.TimeOfDay;
+            // see if start comes before end
+            if (start < end)
+                return start <= now && now <= end;
+            // start is after end, so do the inverse comparison
+            return !(end < now && now < start);
+        }
+        static void GetSubject(int ID, SlideRange slide) {
+            var query =
+                from sub in subjectTable.AsEnumerable()
+                where sub.Field<int>("ID") == ID
+                select new {
+                    subject = sub.Field<string>("TutorSubject")
+                };
+            string subjects = "";
+            foreach (var q in query) {
+                subjects += q.subject + "\n";
+            }
+            WriteToTextbox(slide, "SubjectsTutored", subjects.TrimEnd('\n'));
+        }
+        static void GetTimes(int ID, SlideRange slide) {
+            var query =
+                from times in scheduleTable.AsEnumerable()
+                where times.Field<int>("ID") == ID
+                orderby times.Field<int>("Day"), times.Field<DateTime>("Start")
+                select new {
+                     time = CultureInfo.CurrentCulture.DateTimeFormat.DayNames[times.Field<int>("Day")-1] + " " + times.Field<DateTime>("Start").ToString("h:mm tt") + " — " + times.Field<DateTime>("end").ToString("h:mm tt")
+                };
+            string availableTimes = "";
+            foreach (var q in query) {
+                availableTimes += q.time + "\n";
+            }
+            WriteToTextbox(slide, "TimesAvailable", availableTimes.TrimEnd('\n'));
         }
         static SlideRange CreateSlide(int copyOfIndex) {
             SlideRange newSlide = objSlides[copyOfIndex].Duplicate();
-            newSlide.SlideShowTransition.Hidden = MsoTriState.msoFalse;
             newSlide.Tags.Add("isCreated", "true");
-            //newSlide.MoveTo(objSlides.Count);
+            newSlide.MoveTo(objSlides.Count);
+            newSlide.SlideShowTransition.Hidden = MsoTriState.msoFalse;
             return newSlide;
         }
         static string WriteToTextbox(SlideRange slide, string textboxName, string inputString) {
             slide.Shapes[textboxName].TextFrame.TextRange.Text = inputString;
             return inputString;
         }
-        static int DeleteSlides() {
-            int numberDeleted = 0;
-            while (objSlides[objSlides.Count].Tags["isCreated"] == "true") {
-                numberDeleted++;
+        static void DeleteSlides() {
+            
+            foreach(string item in createdImages) { 
                 objSlides[objSlides.Count].Delete();
+                File.Delete(AppDomain.CurrentDomain.BaseDirectory + "\\"+strImagePath+"\\" + item);
+                
             }
-            return numberDeleted;
+            
         }
 
     }

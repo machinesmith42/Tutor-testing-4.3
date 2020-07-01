@@ -42,7 +42,7 @@
     </Window.Resources>
 
     <Grid>
-        <Image x:Name="myImage" Stretch="Uniform" RenderTransformOrigin="0.5,0.5"  
+        <Image x:Name="myImage" Stretch="Uniform" RenderTransformOrigin="0.5,0.5" Source="{Binding}" 
     >
             <Image.RenderTransform>
                 <TransformGroup>
@@ -50,7 +50,7 @@
                 </TransformGroup>
             </Image.RenderTransform>
         </Image>
-        <Image x:Name="myImage2" Stretch="Uniform" RenderTransformOrigin="0.5,0.5"  
+        <Image x:Name="myImage2" Stretch="Uniform" RenderTransformOrigin="0.5,0.5" 
     >
             <Image.RenderTransform>
                 <TransformGroup>
