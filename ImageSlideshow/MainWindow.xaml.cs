@@ -44,6 +44,7 @@ namespace ImageSlideshow {
         public static readonly int tutorsSlide = Convert.ToInt32(ConfigurationManager.AppSettings["tutorSlide"]);
         public static readonly int noTutorsSlide = Convert.ToInt32(ConfigurationManager.AppSettings["noTutorSlide"]);
         public static readonly int FirstAddedSlide = Convert.ToInt32(ConfigurationManager.AppSettings["FirstCreateSlide"]);
+        private readonly int updateSlide;
         public static List<string> createdImages = new List<string>();
         public MainWindow() {
             InitializeComponent();
@@ -58,16 +59,19 @@ namespace ImageSlideshow {
             subjectAdapt.Dispose();
             strImagePath = ConfigurationManager.AppSettings["ImagePath"];
             strPPPath = ConfigurationManager.AppSettings["PPPath"];
+            
             DirectoryInfo dir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "\\" + strImagePath);
             foreach (FileInfo file in dir.EnumerateFiles()) {
                 file.Delete();
             }
+            int numberVisibleSlides = 0; 
             for (int i = 1; i < objSlides.Count; i++) {
                 if (objSlides[i].SlideShowTransition.Hidden == MsoTriState.msoFalse) {
-                    objSlides[i].Export(AppDomain.CurrentDomain.BaseDirectory + "\\"+strImagePath+"\\" + i.ToString("D2", CultureInfo.CurrentCulture) + ".jpg", "JPG"); 
+                    objSlides[i].Export(AppDomain.CurrentDomain.BaseDirectory + "\\"+strImagePath+"\\" + i.ToString("D2", CultureInfo.CurrentCulture) + ".jpg", "JPG");
+                    numberVisibleSlides++;
                 }
             }
-
+            updateSlide = numberVisibleSlides;
             //Initialize Image control, Image directory path and Image timer.
             IntervalTimer = Convert.ToInt32(ConfigurationManager.AppSettings["IntervalTime"], CultureInfo.CurrentCulture);
             
@@ -143,7 +147,7 @@ namespace ImageSlideshow {
 
         private void TimerImageChange_Tick(object sender, EventArgs e) {
             PlaySlideShow();
-            if (CurrentSourceIndex == 1) {
+            if (CurrentSourceIndex == updateSlide-1) {
                 Refresh();
             }
         }
@@ -181,9 +185,8 @@ namespace ImageSlideshow {
                 from tutor in tutorTable.AsEnumerable()
                 join schedule in scheduleTable
                 on tutor.Field<int>("ID") equals schedule.Field<int>("ID")
-                where schedule.Field<int>("Day") == (int)currentDayTime.DayOfWeek + 1 &&
-                schedule.Field<DateTime>("Start").TimeOfDay <= currentDayTime.TimeOfDay &&
-                schedule.Field<DateTime>("End").TimeOfDay >= currentDayTime.TimeOfDay
+                where (schedule.Field<int>("Day") == (int)currentDayTime.DayOfWeek + 1) && TimeBetween(currentDayTime, schedule.Field<DateTime>("Start").TimeOfDay, schedule.Field<DateTime>("End").TimeOfDay)
+               
                 select new {
                     TutorID = tutor.Field<int>("ID"),
                     Name = tutor.Field<string>("FirstName") + " " + tutor.Field<string>("LastName")
@@ -209,6 +212,15 @@ namespace ImageSlideshow {
                 createdImages.Add(imageName);
             }
             
+        }
+        static bool TimeBetween(DateTime datetime, TimeSpan start, TimeSpan end) {
+            // convert datetime to a TimeSpan
+            TimeSpan now = datetime.TimeOfDay;
+            // see if start comes before end
+            if (start < end)
+                return start <= now && now <= end;
+            // start is after end, so do the inverse comparison
+            return !(end < now && now < start);
         }
         static void GetSubject(int ID, SlideRange slide) {
             var query =
