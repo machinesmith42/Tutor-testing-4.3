@@ -67,7 +67,8 @@ namespace ImageSlideshow {
             int numberVisibleSlides = 0; 
             for (int i = 1; i < objSlides.Count; i++) {
                 if (objSlides[i].SlideShowTransition.Hidden == MsoTriState.msoFalse) {
-                    objSlides[i].Export(AppDomain.CurrentDomain.BaseDirectory + "\\"+strImagePath+"\\" + i.ToString("D2", CultureInfo.CurrentCulture) + ".jpg", "JPG");
+                    objSlides[i].Export(AppDomain.CurrentDomain.BaseDirectory + "\\"+strImagePath+"\\" + i.ToString("D2",CultureInfo.CurrentCulture) + "_" + DateTime.Now.ToString("HH-mm-ss") + ".jpg", "JPG");
+                    
                     numberVisibleSlides++;
                 }
             }
@@ -199,7 +200,7 @@ namespace ImageSlideshow {
                     WriteToTextbox(slide, "TutorName", q.Name);
                     GetSubject(q.TutorID, slide);
                     GetTimes(q.TutorID, slide);
-                    string imageName = DateTime.Now.ToString("HH-mm-ss") + "_" + i.ToString(CultureInfo.CurrentCulture) + ".jpg";
+                    string imageName =  i.ToString(CultureInfo.CurrentCulture) + "_" + DateTime.Now.ToString("HH-mm-ss") + ".jpg";
                     slide.Export(AppDomain.CurrentDomain.BaseDirectory + "\\"+ strImagePath + "\\" + imageName, "JPG");
                     i++;
                     createdImages.Add(imageName);
@@ -207,7 +208,7 @@ namespace ImageSlideshow {
                 }
             } else {
                 SlideRange slide = CreateSlide(noTutorsSlide);
-                string imageName = DateTime.Now.ToString("HH-mm-ss") + "_" + i.ToString(CultureInfo.CurrentCulture) + ".jpg";
+                string imageName = DateTime.Now.ToString("HH-mm-ss") + "_" + i.ToString("D2",CultureInfo.CurrentCulture) + ".jpg";
                 slide.Export(AppDomain.CurrentDomain.BaseDirectory + "\\" + strImagePath + "\\" + imageName, "JPG");
                 createdImages.Add(imageName);
             }
