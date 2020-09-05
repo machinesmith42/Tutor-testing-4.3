@@ -14,6 +14,8 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using MsoTriState = Microsoft.Office.Core.MsoTriState;
+using ImageSlideshow.Views;
+using ImageSlideshow.ViewModels;
 
 namespace ImageSlideshow {
     /// <summary>
@@ -55,6 +57,8 @@ namespace ImageSlideshow {
         public static List<string> createdImages = new List<string>();
         public MainWindow() {
             InitializeComponent();
+             
+             
             AllTutorsTableAdapter tutorTableAdapt = new AllTutorsTableAdapter();
             tutorTableAdapt.Fill(tutorTable);
             ScheduleTableAdapter scheduleAdapt = new ScheduleTableAdapter();
@@ -96,7 +100,7 @@ namespace ImageSlideshow {
             };
             clockUpdate.Tick += new EventHandler(ClockUpdate_Tick);
         }
-
+        
         private void ClockUpdate_Tick(object sender, EventArgs e) {
             DateTime d;
 
@@ -295,5 +299,16 @@ namespace ImageSlideshow {
             
         }
 
+        private void ScheduleBtn_Click(object sender, RoutedEventArgs e) {
+            Schedule objPopupwindow = new Schedule();
+            objPopupwindow.ShowDialog();
+        }
+
+        
+
+        private void FindTutor_Click(object sender, RoutedEventArgs e) {
+            Form objPopupwindow = new Form();
+            objPopupwindow.ShowDialog();
+        }
     }
 }
