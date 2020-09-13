@@ -4,57 +4,109 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:interop="clr-namespace:Walterlv.Demo.Interop"
+        interop:WindowBlur.IsEnabled="True"
         mc:Ignorable="d"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
-        Title="Form" >
+        Height="750"
+        Width="1250"
+        Title="Form"
+        WindowStyle="None"
+        AllowsTransparency="True" 
+        
+        
+       >
+    <Window.Background>
+        <SolidColorBrush Opacity=".9" Color="WhiteSmoke" ></SolidColorBrush>
+    </Window.Background>
     
-    <Grid Margin="100px">
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"></ColumnDefinition>
-                <ColumnDefinition Width="Auto"></ColumnDefinition>
-                <ColumnDefinition Width="Auto"></ColumnDefinition>
-                <ColumnDefinition Width="Auto"></ColumnDefinition>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"></RowDefinition>
-                <RowDefinition Height="Auto"></RowDefinition>
-                <RowDefinition Height="Auto"></RowDefinition>
-                <RowDefinition Height="Auto"></RowDefinition>
-                <RowDefinition Height="Auto"></RowDefinition>
-                <RowDefinition Height="Auto"></RowDefinition>
-            </Grid.RowDefinitions>
-            <Label FontSize="20px" Grid.Row="0" Grid.Column="0">Campus</Label>
-            <xctk:CheckComboBox FontSize ="20px" Grid.Row="0" Grid.Column="1">
-                <ComboBoxItem>All</ComboBoxItem>
-                <ComboBoxItem>Andover</ComboBoxItem>
-                <ComboBoxItem>El Dorado</ComboBoxItem>
+    <Window.Resources>
 
-            </xctk:CheckComboBox>
+    </Window.Resources>
+    <Grid>
+        <Grid Margin="100px"  >
+            <Grid HorizontalAlignment="Left" VerticalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Label FontSize="20px" Grid.Row="0" Grid.Column="0" >Campus</Label>
+                <Grid Grid.Column="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Label FontSize="20px" Grid.Row="0" Grid.Column="0" Padding="10" VerticalAlignment="Center">Andover</Label>
+                    <CheckBox Grid.Row="0" Grid.Column="1" Padding="10" VerticalAlignment="Center" x:Name="andoverCheck"></CheckBox>
+                    <Label FontSize="20px" Grid.Row="1" Grid.Column="0" Padding="10" VerticalAlignment="Center" >El Dorado</Label>
+                    <CheckBox Grid.Row="1" Grid.Column="1" Padding="10" VerticalAlignment="Center" x:Name="eldorado"></CheckBox>
+                    <Label FontSize="20px" Grid.Row="2" Grid.Column="0" Padding="10" VerticalAlignment="Center">Online</Label>
+                    <CheckBox Grid.Row="2" Grid.Column="1" Padding="0" VerticalAlignment="Center" x:Name="online"></CheckBox>
+                </Grid>
 
-            <Label FontSize="20px" Grid.Row="0" Grid.Column="2">Include Online?</Label>
-            <CheckBox Grid.Row ="0" Grid.Column="3" ></CheckBox>
-            <Label FontSize="20px" Grid.Row="1" Grid.Column="0">Subject</Label>
-            <TextBox Grid.Row="1" Grid.Column="1" MinWidth="200" FontSize="20px" Width ="Auto" Padding="10px">Subject</TextBox>
-            <Label FontSize="20px" Grid.Row="2" Grid.Column="0">Weekday</Label>
-            <xctk:CheckComboBox FontSize="20px" Grid.Row="2" Grid.Column="1">
-                <ComboBoxItem>Monday</ComboBoxItem>
-                <ComboBoxItem>Tuesday</ComboBoxItem>
-                <ComboBoxItem>Wenesday</ComboBoxItem>
-                <ComboBoxItem>Thursday</ComboBoxItem>
-                <ComboBoxItem>Friday</ComboBoxItem>
-                <ComboBoxItem>Saturday</ComboBoxItem>
-                <ComboBoxItem>Sunday</ComboBoxItem>
-            </xctk:CheckComboBox>
-            <Label FontSize="20" Grid.Row="3">Time</Label>
-            <xctk:TimePicker Format="ShortTime" FontSize="20px" Grid.Row="3" Grid.Column="1" ></xctk:TimePicker>
-            <Label FontSize="20" Grid.Row="4">Tutor Name</Label>
-            <xctk:CheckComboBox Grid.Row="4" Grid.Column="1">
+                <Label FontSize="20px" Grid.Row="1" Grid.Column="0" Margin="0,30,50,30" >Subject</Label>
+                <TextBox Grid.Row="1" Grid.Column="1" MinWidth="200" FontSize="20px" Width ="Auto" Margin="0,30,0,30" Padding="10">Subject</TextBox>
+                <Label FontSize="20px" Grid.Row="2" Grid.Column="0" Margin="0,30,50,30" >Weekday</Label>
+                <Grid Grid.Row="2" Grid.Column="1" Margin="0,30,50,30">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Label FontSize="20px" Grid.Row="0" Grid.Column="0" Padding="10" VerticalAlignment="Center">Monday</Label>
+                    <CheckBox Grid.Row="0" Grid.Column="1" Padding="10" VerticalAlignment="Center"></CheckBox>
+                    <Label FontSize="20px" Grid.Row="0" Grid.Column="2" Padding="10" VerticalAlignment="Center">Tuesday</Label>
+                    <CheckBox Grid.Row="0" Grid.Column="3" Padding="10" VerticalAlignment="Center"></CheckBox>
+                    <Label FontSize="20px" Grid.Row="1" Grid.Column="0" Padding="10" VerticalAlignment="Center">Wednesday</Label>
+                    <CheckBox Grid.Row="1" Grid.Column="1" Padding="10" VerticalAlignment="Center"></CheckBox>
+                    <Label FontSize="20px" Grid.Row="1" Grid.Column="2" Padding="10" VerticalAlignment="Center">Thursday</Label>
+                    <CheckBox Grid.Row="1" Grid.Column="3" Padding="10" VerticalAlignment="Center"></CheckBox>
+                    <Label FontSize="20px" Grid.Row="2" Grid.Column="0" Padding="10" VerticalAlignment="Center">Friday</Label>
+                    <CheckBox Grid.Row="2" Grid.Column="1" Padding="10" VerticalAlignment="Center"></CheckBox>
+                    <Label FontSize="20px" Grid.Row="2" Grid.Column="2" Padding="10" VerticalAlignment="Center">Weekends</Label>
+                    <CheckBox Grid.Row="3" Grid.Column="3" Padding="10" VerticalAlignment="Center"></CheckBox>
+                </Grid>
+                <Label FontSize="20" Grid.Row="3">Time</Label>
+                <xctk:TimePicker Format="ShortTime" FontSize="20px" Grid.Row="3" Grid.Column="1" Padding="10"></xctk:TimePicker>
 
-            </xctk:CheckComboBox>
+
+
+            </Grid>
+            <Button HorizontalAlignment="Right" VerticalAlignment="Bottom" FontSize="20" Name="submit" Click="Submit_Click">Submit</Button>
+            
         </Grid>
-        <Button HorizontalAlignment="Right" VerticalAlignment="Bottom" FontSize="20px">Submit</Button>
+        <Button x:Name="closeButton" HorizontalAlignment="Right" Content="X"  VerticalAlignment="Top" Padding="25,10,25,10" FontSize="15" BorderThickness="0" Click="Button_Click" IsCancel="True" Background="#E41C2C" Foreground="#747474">
+           
+            
+        </Button>
     </Grid>
-    
 </Window>

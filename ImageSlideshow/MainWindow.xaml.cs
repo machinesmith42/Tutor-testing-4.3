@@ -15,7 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using MsoTriState = Microsoft.Office.Core.MsoTriState;
 using ImageSlideshow.Views;
-using ImageSlideshow.ViewModels;
+
 
 namespace ImageSlideshow {
     /// <summary>
