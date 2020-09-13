@@ -18,7 +18,7 @@
         
        >
     <Window.Background>
-        <SolidColorBrush Opacity=".9" Color="WhiteSmoke" ></SolidColorBrush>
+        <SolidColorBrush Opacity=".75" Color="WhiteSmoke" ></SolidColorBrush>
     </Window.Background>
     
     <Window.Resources>

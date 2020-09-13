@@ -6,9 +6,16 @@
         Loaded="Window_Loaded" mc:Ignorable="d"
         Title="MainWindow"  WindowStyle=" none" ResizeMode="NoResize"
         WindowState="Maximized"
+        xmlns:interop="clr-namespace:Walterlv.Demo.Interop"
+        interop:WindowBlur.IsEnabled="True"
         Height="{Binding SystemParameters.PrimaryScreenHeight}" 
-        Width="{Binding SystemParameters.PrimaryScreenWidth}">
-
+        Width="{Binding SystemParameters.PrimaryScreenWidth}"
+        AllowsTransparency="True"
+        
+        >
+    <Window.Background>
+        <SolidColorBrush Opacity=".75" Color="WhiteSmoke" ></SolidColorBrush>
+    </Window.Background>
     <Window.Resources>
         <!-- Start Fade -->
         <Storyboard x:Key="FadeIn" >
