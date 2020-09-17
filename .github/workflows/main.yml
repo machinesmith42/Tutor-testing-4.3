@@ -21,4 +21,11 @@ jobs:
       run: nuget restore Tutor-Testing-4.3.sln
  
     - name: Build App
-      run: msbuild Tutor-Testing-4.3.sln /p:Configuration=Release
+      run: msbuild Tutor-Testing-4.3.sln /p:Configuration=Release /p:DeployOnBuild=true /p:PublishProfile=FolderProfile
+      
+      name: Upload Artifact
+      uses: actions/upload-artifact@v1.0.0
+      with:
+        name: published_webapp
+        path: bin\Release\Publish
+      
