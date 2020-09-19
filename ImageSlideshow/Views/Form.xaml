@@ -14,7 +14,7 @@
         Title="Form"
         WindowStyle="None"
         AllowsTransparency="True" 
-        
+        Loaded="Form_Load"  
         
        >
     <Window.Background>
@@ -68,36 +68,12 @@
                 </Grid>
 
                 <Label FontSize="20px" Grid.Row="1" Grid.Column="0" Margin="0,30,50,30" >Subject</Label>
-                <TextBox Grid.Row="1" Grid.Column="1" MinWidth="200" FontSize="20px" Width ="Auto" Margin="0,30,0,30" Padding="10">Subject</TextBox>
+                <xctk:CheckComboBox Grid.Row="1" Grid.Column="1" MinWidth="200" FontSize="20px" Width ="Auto" Margin="0,30,0,30" Padding="10" x:Name="subjects" IsSelectAllActive="True" IsEditable="False" Delimiter=","></xctk:CheckComboBox>
                 <Label FontSize="20px" Grid.Row="2" Grid.Column="0" Margin="0,30,50,30" >Weekday</Label>
-                <Grid Grid.Row="2" Grid.Column="1" Margin="0,30,50,30">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"></ColumnDefinition>
-                        <ColumnDefinition Width="Auto"></ColumnDefinition>
-                        <ColumnDefinition Width="Auto"></ColumnDefinition>
-                        <ColumnDefinition Width="Auto"></ColumnDefinition>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"></RowDefinition>
-                        <RowDefinition Height="Auto"></RowDefinition>
-                        <RowDefinition Height="Auto"></RowDefinition>
-                    </Grid.RowDefinitions>
-                    <Label FontSize="20px" Grid.Row="0" Grid.Column="0" Padding="10" VerticalAlignment="Center">Monday</Label>
-                    <CheckBox Grid.Row="0" Grid.Column="1" Padding="10" VerticalAlignment="Center"></CheckBox>
-                    <Label FontSize="20px" Grid.Row="0" Grid.Column="2" Padding="10" VerticalAlignment="Center">Tuesday</Label>
-                    <CheckBox Grid.Row="0" Grid.Column="3" Padding="10" VerticalAlignment="Center"></CheckBox>
-                    <Label FontSize="20px" Grid.Row="1" Grid.Column="0" Padding="10" VerticalAlignment="Center">Wednesday</Label>
-                    <CheckBox Grid.Row="1" Grid.Column="1" Padding="10" VerticalAlignment="Center"></CheckBox>
-                    <Label FontSize="20px" Grid.Row="1" Grid.Column="2" Padding="10" VerticalAlignment="Center">Thursday</Label>
-                    <CheckBox Grid.Row="1" Grid.Column="3" Padding="10" VerticalAlignment="Center"></CheckBox>
-                    <Label FontSize="20px" Grid.Row="2" Grid.Column="0" Padding="10" VerticalAlignment="Center">Friday</Label>
-                    <CheckBox Grid.Row="2" Grid.Column="1" Padding="10" VerticalAlignment="Center"></CheckBox>
-                    <Label FontSize="20px" Grid.Row="2" Grid.Column="2" Padding="10" VerticalAlignment="Center">Weekends</Label>
-                    <CheckBox Grid.Row="3" Grid.Column="3" Padding="10" VerticalAlignment="Center"></CheckBox>
-                </Grid>
+                <xctk:CheckComboBox Grid.Row="2" Grid.Column="1" Margin="0,30,0,30" Padding="10px" FontSize="20px" x:Name="weekdays" IsSelectAllActive="True" IsEditable="False" Delimiter=","></xctk:CheckComboBox>
                 <Label FontSize="20" Grid.Row="3">Time</Label>
-                <xctk:TimePicker Format="ShortTime" FontSize="20px" Grid.Row="3" Grid.Column="1" Padding="10"></xctk:TimePicker>
-
+                <xctk:TimePicker Format="ShortTime" FontSize="20px" Grid.Row="3" Grid.Column="1" Padding="10" x:Name="time" ></xctk:TimePicker>
+                
 
 
             </Grid>
