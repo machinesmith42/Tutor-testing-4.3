@@ -1,37 +1,31 @@
-name: Build and Deploy
 
-on:
-  push:
-    branches:
-      - master
-
-env:
-  AZURE_WEBAPP_NAME: Tutor-Testing-4.3.sln    # set this to your application's name
-  AZURE_WEBAPP_PACKAGE_PATH: '$(Build.ArtifactStagingDirectory)'      # set this to the path to your web app project, defaults to the repository root
-
+	
+name: Build Web App
+ 
+on: [push]
+ 
 jobs:
   build:
-    name: Build and deploy
+ 
     runs-on: windows-latest
+ 
     steps:
-    - uses: actions/checkout@v2
-    
-    - name: Setup MSBuild path
+    - uses: actions/checkout@v1
+      name: Checkout Code
+     
+    - name: Setup MSBuild Path
       uses: warrenbuckley/Setup-MSBuild@v1
-    
+       
     - name: Setup NuGet
       uses: NuGet/setup-nuget@v1.0.2
-    
-    - name: Restore NuGet pckages
-      run: nuget restore ${{ env.AZURE_WEBAPP_NAME }}
-
-    - name: Build
-      run: msbuild ${{ env.AZURE_WEBAPP_NAME }} /p:Configuration=Release
-
-    
-
-    - name: Publish artifacts
-      uses: actions/upload-artifact@v2
+     
+    - name: Restore NuGet Packages
+      run: nuget restore Tutor-Testing-4.3.sln
+ 
+    - name: Build and Publish Web App
+      run: msbuild Tutor-Testing-4.3.sln /p:Configuration=Release /p:DeployOnBuild=true /p:PublishProfile=FolderProfile
+ 
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v1.0.0
       with:
-        name: webapp
-        path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+        name: published_webapp
