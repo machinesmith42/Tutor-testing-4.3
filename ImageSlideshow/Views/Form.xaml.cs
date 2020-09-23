@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using ImageSlideshow;
 using ImageSlideshow.TutorDataSetTableAdapters;
 using System.Diagnostics;
+using System.Globalization;
 
 namespace ImageSlideshow.Views {
     /// <summary>
@@ -42,7 +43,7 @@ namespace ImageSlideshow.Views {
         }
 
         private void Button_Click(object sender, RoutedEventArgs e) {
-            this.Close();
+            Close();
         }
         private void Form_Load(object sender, RoutedEventArgs e) {
             subjects.Items.Add(new ComboBoxItem<string>("All", "all"));
@@ -74,11 +75,11 @@ namespace ImageSlideshow.Views {
               campus[0] = "Andover";
                 isCampusChecked = true;
             }
-            if ((bool)eldorado.IsChecked) {
+            if ((bool)eldoradoCheck.IsChecked) {
                 campus[1] = "El Dorado";
                 isCampusChecked = true;
             }
-            if ((bool)online.IsChecked) {
+            if ((bool)onlineCheck.IsChecked) {
                 campus[2] = "Online";
                 isCampusChecked = true;
             }
@@ -88,8 +89,10 @@ namespace ImageSlideshow.Views {
             if (weekdays.SelectedItems.Count > 0) {
                 isWeekdaySelected = true;
             }
+            DateTime datetime = new DateTime();
             if(time.Value.HasValue) {
                 isTimeSelected = true;
+                datetime = time.Value.GetValueOrDefault();
             }
             var query =
                 from schedule in scheduleTable.AsEnumerable()
@@ -98,14 +101,52 @@ namespace ImageSlideshow.Views {
                 where (campus.Contains(schedule.Field<string>("campus")) && isCampusChecked || !isCampusChecked) && 
                       (subjects.SelectedValue.Split(',').ToList().Contains(subject.Field<string>("TutorSubject")) && isSubjectSelected || !isSubjectSelected) &&
                       (weekdays.SelectedValue.Split(',').ToList().Contains(schedule.Field<int>("Day").ToString()) && isWeekdaySelected || !isWeekdaySelected) &&
-                      (TimeBetween((DateTime)time.Value, schedule.Field<DateTime>("Start").TimeOfDay, schedule.Field<DateTime>("End").TimeOfDay) && isTimeSelected || !isTimeSelected)
+                      !isTimeSelected || (TimeBetween(datetime, schedule.Field<DateTime>("Start").TimeOfDay, schedule.Field<DateTime>("End").TimeOfDay) && isTimeSelected)
                 orderby schedule.Field<int>("ID")
                 select new {
-                    TutorID = schedule.Field<int>("ID")
+                    TutorID = schedule.Field<int>("ID"),
+                    
                 };
+            
             foreach(var q in query) {
-                Debug.Print(q.TutorID.ToString()+"\n");
+                
             }
+            
+            
+        }
+        static List<Subject> GetSubject(int ID) {
+            List<Subject> subjects = new List<Subject>();
+            var query =
+                from sub in subjectTable.AsEnumerable()
+                where sub.Field<int>("ID") == ID
+                select new {
+                    subject = sub.Field<string>("TutorSubject")
+                };
+            
+            foreach (var q in query) {
+                subjects.Add(new Subject() { Subjects = q.subject });
+                
+            }
+            return subjects;
+        }
+        static List<Time> GetTimes(int ID) {
+            List<Time> time = new List<Time>(); 
+            var query =
+                from times in scheduleTable.AsEnumerable()
+                where times.Field<int>("ID") == ID
+                orderby times.Field<int>("Day"), times.Field<DateTime>("Start")
+                select new {
+                    dayName = CultureInfo.CurrentCulture.DateTimeFormat.DayNames[times.Field<int>("Day") - 1],
+                    start =  times.Field<DateTime>("Start"),
+                    end = times.Field<DateTime>("End"),
+                    campus = times.Field<string>("Campus")
+                };
+
+            foreach (var q in query) {
+                time.Add(new Time() { Start = q.start, End = q.end, DayName = q.dayName, Campus = q.campus });
+            }
+            return time;
+            
         }
         static bool TimeBetween(DateTime datetime, TimeSpan start, TimeSpan end) {
             // convert datetime to a TimeSpan
@@ -129,7 +170,25 @@ namespace ImageSlideshow.Views {
             Text = text;
             Value = value;
         }
+    }
+     public class Time {
+        
 
+        public DateTime Start { get; set; }
+        public DateTime End { get; set; }
+        public string Campus { get; set;}
+        public string DayName { get; set;}
+
+        
+
+    }
+    public class Subject {
+        public string Subjects { get; set; }
+    }
+    public class ListItem {
+        public List<Time> Times{ get; set; }
+        public List<Subject> Subjects { get; set; }
+        public string Name { get; set; }
     }
 
 

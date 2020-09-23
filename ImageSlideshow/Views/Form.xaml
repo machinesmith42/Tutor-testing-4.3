@@ -26,6 +26,10 @@
     </Window.Resources>
     <Grid>
         <Grid Margin="100px"  >
+            <Grid.ColumnDefinitions>
+                
+             
+            </Grid.ColumnDefinitions>
             <Grid HorizontalAlignment="Left" VerticalAlignment="Center">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"></ColumnDefinition>
@@ -62,9 +66,9 @@
                     <Label FontSize="20px" Grid.Row="0" Grid.Column="0" Padding="10" VerticalAlignment="Center">Andover</Label>
                     <CheckBox Grid.Row="0" Grid.Column="1" Padding="10" VerticalAlignment="Center" x:Name="andoverCheck"></CheckBox>
                     <Label FontSize="20px" Grid.Row="1" Grid.Column="0" Padding="10" VerticalAlignment="Center" >El Dorado</Label>
-                    <CheckBox Grid.Row="1" Grid.Column="1" Padding="10" VerticalAlignment="Center" x:Name="eldorado"></CheckBox>
+                    <CheckBox Grid.Row="1" Grid.Column="1" Padding="10" VerticalAlignment="Center" x:Name="eldoradoCheck"></CheckBox>
                     <Label FontSize="20px" Grid.Row="2" Grid.Column="0" Padding="10" VerticalAlignment="Center">Online</Label>
-                    <CheckBox Grid.Row="2" Grid.Column="1" Padding="0" VerticalAlignment="Center" x:Name="online"></CheckBox>
+                    <CheckBox Grid.Row="2" Grid.Column="1" Padding="0" VerticalAlignment="Center" x:Name="onlineCheck"></CheckBox>
                 </Grid>
 
                 <Label FontSize="20px" Grid.Row="1" Grid.Column="0" Margin="0,30,50,30" >Subject</Label>
@@ -77,10 +81,28 @@
 
 
             </Grid>
-            <Button HorizontalAlignment="Right" VerticalAlignment="Bottom" FontSize="20" Name="submit" Click="Submit_Click">Submit</Button>
+            <Grid HorizontalAlignment="Right" VerticalAlignment="Top" Name="Results">
+                <Label>Results</Label>
+                <TabControl x:Name="Campus" FontSize="15px">
+                    <TabItem Header="Andover">
+                        <ListView  x:Name="andover">
+                            
+                        </ListView>
+                    </TabItem>
+                    <TabItem Header="El Dorado">
+                        <ListView  x:Name="eldorado">
+                            
+                        </ListView>
+                    </TabItem>
+                    <TabItem Header="Online">
+                        <ListView x:Name="online"></ListView>
+                    </TabItem>
+                </TabControl>
+            </Grid>
+            <Button HorizontalAlignment="Right" VerticalAlignment="Bottom" FontSize="20" Name="submit" Click="Submit_Click"  >Submit</Button>
             
         </Grid>
-        <Button x:Name="closeButton" HorizontalAlignment="Right" Content="X"  VerticalAlignment="Top" Padding="25,10,25,10" FontSize="15" BorderThickness="0" Click="Button_Click" IsCancel="True" Background="#E41C2C" Foreground="#747474">
+        <Button x:Name="closeButton" HorizontalAlignment="Right" Content="X"  VerticalAlignment="Top" Padding="25,10,25,10" FontSize="15" BorderThickness="0" Click="Button_Click" IsCancel="True" Background="#E41C2C" Foreground="#C4C4C4">
            
             
         </Button>
