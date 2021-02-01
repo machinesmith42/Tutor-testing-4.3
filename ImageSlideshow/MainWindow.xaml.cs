@@ -14,6 +14,8 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using MsoTriState = Microsoft.Office.Core.MsoTriState;
+using ImageSlideshow.Views;
+
 
 namespace ImageSlideshow {
     /// <summary>
@@ -49,11 +51,14 @@ namespace ImageSlideshow {
 
         public static readonly int tutorsSlide = Convert.ToInt32(ConfigurationManager.AppSettings["tutorSlide"]);
         public static readonly int noTutorsSlide = Convert.ToInt32(ConfigurationManager.AppSettings["noTutorSlide"]);
-        public static readonly int FirstAddedSlide = Convert.ToInt32(ConfigurationManager.AppSettings["firstCreateSlide"]);
+
+        public static List<string> AllSubjects = new List<string>();
         private readonly int updateSlide;
         public static List<string> createdImages = new List<string>();
         public MainWindow() {
             InitializeComponent();
+             
+             
             AllTutorsTableAdapter tutorTableAdapt = new AllTutorsTableAdapter();
             tutorTableAdapt.Fill(tutorTable);
             ScheduleTableAdapter scheduleAdapt = new ScheduleTableAdapter();
@@ -95,7 +100,7 @@ namespace ImageSlideshow {
             };
             clockUpdate.Tick += new EventHandler(ClockUpdate_Tick);
         }
-
+        
         private void ClockUpdate_Tick(object sender, EventArgs e) {
             DateTime d;
 
@@ -156,6 +161,12 @@ namespace ImageSlideshow {
             PlaySlideShow();
             if (CurrentSourceIndex == updateSlide-1) {
                 Refresh();
+                if (AllSubjects.Any()) {
+                    subject.Content = "Subjects Tutored now: " + string.Join(", ", AllSubjects);
+                } else {
+                    subject.Content = "No tutors are available right now. Please check butlercc.edu/tutoring for current schedules.";
+                }
+                
             }
         }
 
@@ -182,8 +193,10 @@ namespace ImageSlideshow {
 
         }
         static void Refresh() {
+            AllSubjects.Clear();
             DeleteSlides();
             DisplayTutors();
+            
         }
         static void DisplayTutors() {
             DateTime currentDayTime = DateTime.Now;
@@ -244,6 +257,9 @@ namespace ImageSlideshow {
             string subjects = "";
             foreach (var q in query) {
                 subjects += q.subject + "\n";
+                if (!AllSubjects.Contains(q.subject)) {
+                    AllSubjects.Add(q.subject);
+                }
             }
             WriteToTextbox(slide, "SubjectsTutored", subjects.TrimEnd('\n'));
         }
@@ -283,5 +299,16 @@ namespace ImageSlideshow {
             
         }
 
+        private void ScheduleBtn_Click(object sender, RoutedEventArgs e) {
+            Schedule objPopupwindow = new Schedule();
+            objPopupwindow.ShowDialog();
+        }
+
+        
+
+        private void FindTutor_Click(object sender, RoutedEventArgs e) {
+            Form objPopupwindow = new Form();
+            objPopupwindow.ShowDialog();
+        }
     }
 }

@@ -1,0 +1,33 @@
+﻿<Window x:Class="ImageSlideshow.Views.Schedule"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Schedule" Height="900" Width="1200"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        >
+    <Grid>
+        <TabControl FontSize="15">
+            <TabItem Header="Andover">
+                
+            </TabItem>
+            <TabItem Header="El Dorado">
+
+            </TabItem>
+            <TabItem Header="Online">
+
+            </TabItem>
+            <TabItem Header="Math Lab (Andover)">
+
+            </TabItem>
+            <TabItem Header="Math Lab (El Dorado)">
+
+            </TabItem>
+            <TabItem Header="Math Lab (Online)">
+
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>

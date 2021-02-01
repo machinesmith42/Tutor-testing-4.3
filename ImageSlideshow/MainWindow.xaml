@@ -6,9 +6,16 @@
         Loaded="Window_Loaded" mc:Ignorable="d"
         Title="MainWindow"  WindowStyle=" none" ResizeMode="NoResize"
         WindowState="Maximized"
+        xmlns:interop="clr-namespace:Walterlv.Demo.Interop"
+        interop:WindowBlur.IsEnabled="True"
         Height="{Binding SystemParameters.PrimaryScreenHeight}" 
-        Width="{Binding SystemParameters.PrimaryScreenWidth}">
+        Width="{Binding SystemParameters.PrimaryScreenWidth}"
+        AllowsTransparency="True"
         
+        >
+    <Window.Background>
+        <SolidColorBrush Opacity=".75" Color="WhiteSmoke" ></SolidColorBrush>
+    </Window.Background>
     <Window.Resources>
         <!-- Start Fade -->
         <Storyboard x:Key="FadeIn" >
@@ -58,13 +65,56 @@
                 </TransformGroup>
             </Image.RenderTransform>
         </Image>
+        
         <TextBlock TextWrapping="Wrap" x:Name="ErrorText" HorizontalAlignment="Stretch" VerticalAlignment="Center" TextAlignment="Center" Visibility="Collapsed" Text="The specified folder does not exist" FontSize="20" />
-        <Border Padding="15">   
-        <StackPanel Height="Auto"  Width="auto" HorizontalAlignment="Right" VerticalAlignment="Top" >
-                <Label HorizontalAlignment="Left" Height="Auto" Width="Auto" HorizontalContentAlignment="Left" Name="date" FontSize="30px"/>
-                <Label HorizontalAlignment="Left" Height="Auto" Width="Auto" HorizontalContentAlignment="Left" Name="clock" FontSize="30px"/>
-            </StackPanel>
+        <Border Padding="15">
+            <Grid>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Button Content="View Schedule"  HorizontalAlignment="Left"
+                VerticalAlignment="Top" Width="Auto" Margin="31,21,0,0" FontSize="25" Grid.Row="0" Grid.Column="0" Name="ScheduleBtn" Click ="ScheduleBtn_Click"/>
+                    <Button Content="Find a Tutor"  HorizontalAlignment="Left" Grid.Row="0" Grid.Column="1" Name ="FindTutor"
+                VerticalAlignment="Top" Width="Auto" Margin="31,21,0,0" FontSize="25"  Click="FindTutor_Click"/>
+                </Grid>
+                
+                
+                <StackPanel Height="Auto"  Width="auto" HorizontalAlignment="Right" VerticalAlignment="Top" Opacity="1">
+                    
+                    <Label HorizontalAlignment="Left" Height="Auto" Width="Auto" HorizontalContentAlignment="Left" Name="date" FontSize="30px" Opacity="1" Panel.ZIndex="1"/>
+                    <Label HorizontalAlignment="Left" Height="Auto" Width="Auto" HorizontalContentAlignment="Left" Name="clock" FontSize="30px" Opacity="1" Panel.ZIndex="1"/>
+                </StackPanel>
+                <StackPanel Height="Auto" Width="Auto" HorizontalAlignment="Left" VerticalAlignment="Bottom" >
+
+                    <Label HorizontalAlignment="Left" Height="Auto" Width="Auto" HorizontalContentAlignment="Left" Name="subject" FontSize="30px" Background="WhiteSmoke" >
+                        <Label.Style>
+                            <Style TargetType="Label">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Label">
+                                            <Border x:Name="_brdMain" 
+                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                        BorderBrush="{TemplateBinding BorderBrush}" 
+                                        Background="{TemplateBinding Background}"
+                                        CornerRadius="7,7,7,7"
+                                        Padding =" 5px"
+                                                    >
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Label.Style>
+                    </Label>
+                </StackPanel>
+            </Grid>
         </Border>
     </Grid>
-   
+    
 </Window>
