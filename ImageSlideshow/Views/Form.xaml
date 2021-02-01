@@ -73,10 +73,10 @@
 
                 <Label FontSize="20px" Grid.Row="1" Grid.Column="0" Margin="0,30,50,30" >Subject</Label>
                 <xctk:CheckComboBox Grid.Row="1" Grid.Column="1" MinWidth="200" FontSize="20px" Width ="Auto" Margin="0,30,0,30" Padding="10" x:Name="subjects" IsSelectAllActive="True" IsEditable="False" Delimiter=","></xctk:CheckComboBox>
-                <Label FontSize="20px" Grid.Row="2" Grid.Column="0" Margin="0,30,50,30" >Weekday</Label>
-                <xctk:CheckComboBox Grid.Row="2" Grid.Column="1" Margin="0,30,0,30" Padding="10px" FontSize="20px" x:Name="weekdays" IsSelectAllActive="True" IsEditable="False" Delimiter=","></xctk:CheckComboBox>
-                <Label FontSize="20" Grid.Row="3">Time</Label>
-                <xctk:TimePicker Format="ShortTime" FontSize="20px" Grid.Row="3" Grid.Column="1" Padding="10" x:Name="time" ></xctk:TimePicker>
+                <Label FontSize="20px" Grid.Row="2" Grid.Column="0" Margin="0,30,50,30" Visibility="Hidden">Weekday</Label>
+                <xctk:CheckComboBox Grid.Row="2" Grid.Column="1" Margin="0,30,0,30" Padding="10px" FontSize="20px" x:Name="weekdays" IsSelectAllActive="True" IsEditable="False" Delimiter="," Visibility="Hidden"></xctk:CheckComboBox>
+                <Label FontSize="20" Grid.Row="3" Visibility="Hidden">Time</Label>
+                <xctk:TimePicker Format="ShortTime" FontSize="20px" Grid.Row="3" Grid.Column="1" Padding="10" x:Name="time" Visibility="Hidden"></xctk:TimePicker>
                 
 
 
@@ -86,16 +86,36 @@
                 <TabControl x:Name="Campus" FontSize="15px">
                     <TabItem Header="Andover">
                         <ListView  x:Name="andover">
-                            
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Header="Name" Width="Auto" DisplayMemberBinding="{Binding Name}" />
+                                    <GridViewColumn Header="Subjects" Width="Auto" DisplayMemberBinding="{Binding Subjects}" />
+                                    <GridViewColumn Header="Times" Width="Auto" DisplayMemberBinding="{Binding Times}" />
+                                </GridView>
+                            </ListView.View>
                         </ListView>
                     </TabItem>
                     <TabItem Header="El Dorado">
                         <ListView  x:Name="eldorado">
-                            
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Header="Name" Width="Auto" DisplayMemberBinding="{Binding Name}" />
+                                    <GridViewColumn Header="Subjects" Width="Auto" DisplayMemberBinding="{Binding Subjects}" />
+                                    <GridViewColumn Header="Times" Width="Auto" DisplayMemberBinding="{Binding Times}" />
+                                </GridView>
+                            </ListView.View>
                         </ListView>
                     </TabItem>
                     <TabItem Header="Online">
-                        <ListView x:Name="online"></ListView>
+                        <ListView x:Name="online">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Header="Name" Width="Auto" DisplayMemberBinding="{Binding Name}" />
+                                    <GridViewColumn Header="Subjects" Width="Auto" DisplayMemberBinding="{Binding Subjects}" />
+                                    <GridViewColumn Header="Times" Width="Auto" DisplayMemberBinding="{Binding Times}" />
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
                     </TabItem>
                 </TabControl>
             </Grid>

@@ -66,6 +66,10 @@ namespace ImageSlideshow.Views {
             weekdays.Items.Add(new ComboBoxItem<int>("Saturday", 1));
         }
         private void Submit_Click(object sender, RoutedEventArgs e) {
+            List<ListItem> andoverTutors = new List<ListItem>();
+            List<ListItem> eldoradoTutors = new List<ListItem>();
+            List<ListItem> onlineTutors = new List<ListItem>();
+            List<ListItem> allTutors = new List<ListItem>();
             bool isCampusChecked = false;
             bool isSubjectSelected = false;
             bool isWeekdaySelected = false;
@@ -98,6 +102,7 @@ namespace ImageSlideshow.Views {
                 from schedule in scheduleTable.AsEnumerable()
                 join subject in subjectTable
                 on schedule.Field<int>("ID") equals subject.Field<int>("ID")
+                
                 where (campus.Contains(schedule.Field<string>("campus")) && isCampusChecked || !isCampusChecked) && 
                       (subjects.SelectedValue.Split(',').ToList().Contains(subject.Field<string>("TutorSubject")) && isSubjectSelected || !isSubjectSelected) &&
                       (weekdays.SelectedValue.Split(',').ToList().Contains(schedule.Field<int>("Day").ToString()) && isWeekdaySelected || !isWeekdaySelected) &&
@@ -109,10 +114,43 @@ namespace ImageSlideshow.Views {
                 };
             
             foreach(var q in query) {
-                
+                allTutors.Add(new ListItem() { Name = GetName(q.TutorID), Subjects = GetSubject(q.TutorID), Times = GetTimes(q.TutorID) });
             }
-            
-            
+            foreach(ListItem Tutor in allTutors) {
+                List<Time> Times = Tutor.Times.ToList();
+                foreach(Time time in Times) {
+                    if(time.Campus == "Andover") {
+                        andoverTutors.Add(Tutor);
+                    }
+                    if (time.Campus == "El Dorado") {
+                        eldoradoTutors.Add(Tutor);
+                    }
+                    if (time.Campus == "Online") {
+                        onlineTutors.Add(Tutor);
+                    }
+                }
+            }
+            if (andoverTutors.Any()) {
+                andover.ItemsSource = andoverTutors;
+            }
+            if (eldoradoTutors.Any()) {
+                eldorado.ItemsSource = eldoradoTutors;
+            }
+            if (onlineTutors.Any()) {
+                online.ItemsSource = onlineTutors;
+            }
+
+
+        }
+        static string GetName(int ID) {
+            var query = 
+            from tutor in tutorTable.AsEnumerable()
+                where tutor.Field<int>("ID") == ID
+                select new {
+                    Name = tutor.Field<string>("FirstName") + " " + tutor.Field<string>("LastName")
+                };
+            return query.First().Name;
+
         }
         static List<Subject> GetSubject(int ID) {
             List<Subject> subjects = new List<Subject>();
@@ -189,6 +227,7 @@ namespace ImageSlideshow.Views {
         public List<Time> Times{ get; set; }
         public List<Subject> Subjects { get; set; }
         public string Name { get; set; }
+        
     }
 
 
